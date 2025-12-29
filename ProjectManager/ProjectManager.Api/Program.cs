@@ -4,8 +4,17 @@ using ProjectManager.Api;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSignalR();
+builder.Services.AddCors(o =>
+{
+    o.AddPolicy("ui", x => x
+        .AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader());
+});
 
 var app = builder.Build();
+
+app.UseCors("ui");
 
 app.MapHub<CommandOutputHub>("/logs");
 
@@ -26,5 +35,7 @@ app.MapPost("/run", async (RunCommandRequest request) =>
 
     await command.ExecuteAsync();
 });
+
+app.MapGet("/ping", () => "pong");
 
 app.Run();

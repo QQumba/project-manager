@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import Button from './components/button';
 import CommandInput from './components/command-input';
-import { Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, Variable } from 'lucide-react';
 import EditableText from './components/editable-text';
 
 function App() {
@@ -32,7 +32,7 @@ function ProjectCard(props: ProjectCardProps) {
 
 function ActionCard() {
   const [command, setCommand] = useState(
-    'dotnet pack --version-suffix {version}'
+    'dotnet pack --version-suffix {version} -o {output}'
   );
   const [variables, setVariables] = useState<string[]>([]);
   const [isValid, setIsValid] = useState(true);
@@ -90,6 +90,7 @@ function ActionCard() {
           placeholder="C:/..."
           type="text"
           name="work-dir"
+          defaultValue={'C:/git/project-manager/ProjectManager'}
         />
       </div>
       <div className="flex flex-col">
@@ -104,9 +105,15 @@ function ActionCard() {
         /> */}
         <CommandInput name="command" value={command} onChange={setCommand} />
       </div>
-      <VarTable variables={variables} />
+      <VarTable keys={variables} onChange={console.log} />
       <div className="flex justify-around gap-2">
-        <Button>Verify</Button>
+        <Button
+          onClick={() => {
+            console.log(command);
+          }}
+        >
+          Preview
+        </Button>
         <Button
           className={`hover:bg-blue-600
             ${
@@ -115,6 +122,10 @@ function ActionCard() {
             ${status === 'success' ? 'bg-green-600' : ''}
           `}
           onClick={() => {
+            fetch('http://localhost:5232/ping').then((x) =>
+              x.json().then(console.log)
+            );
+
             setStatus('loading');
             setTimeout(() => {
               setStatus('success');
@@ -138,10 +149,13 @@ function ActionCard() {
 }
 
 type VarTableProps = {
-  variables: string[];
+  keys: string[];
+  onChange: (variables: Record<string, string>) => void;
 };
 function VarTable(props: VarTableProps) {
-  if (props.variables.length === 0) {
+  const [variables, setVariables] = useState<Record<string, string>>({});
+
+  if (props.keys.length === 0) {
     return <div>Command does not contain any variables</div>;
   }
 
@@ -154,24 +168,35 @@ function VarTable(props: VarTableProps) {
         Value
       </div>
 
-      {props.variables.map((x, i) => (
+      {props.keys.map((x, i) => (
         <Fragment key={x}>
           <div
             className={`text-gray-500 border-r-2 border-gray-500 p-1 px-2 truncate ${
-              i + 1 < props.variables.length ? 'border-b-2' : ''
+              i + 1 < props.keys.length ? 'border-b-2' : ''
             }`}
           >
             {x}
           </div>
           <div
             className={`font-mono text-blue-600 border-gray-500 p-1 ${
-              i + 1 < props.variables.length ? 'border-b-2' : ''
+              i + 1 < props.keys.length ? 'border-b-2' : ''
             }`}
           >
             <input
               className="w-full rounded-sm px-1 focus:outline-0 focus:bg-blue-100 hover:bg-blue-50"
               type="text"
               placeholder="Enter variable value..."
+              value={variables[x] ?? ''}
+              onChange={(e) =>
+                setVariables((variable) => {
+                  const newVar = {
+                    ...variable,
+                    [x]: e.target.value,
+                  };
+                  props.onChange(newVar);
+                  return newVar;
+                })
+              }
             />
           </div>
         </Fragment>

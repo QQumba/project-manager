@@ -10,7 +10,6 @@
     <ItemGroup>
         <PackageReference Include="CliWrap" Version="3.10.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="10.0.1" />
     </ItemGroup>
 
     <ItemGroup>

@@ -5,8 +5,31 @@ namespace ProjectManager.Api;
 
 public class CommandOutputHub : Hub
 {
-    public async Task<ChannelReader<string>> StreamOutput()
+    private readonly ILogger<CommandOutputHub> _logger;
+    private readonly JobStore _jobStore;
+
+    public CommandOutputHub(ILogger<CommandOutputHub> logger, JobStore jobStore)
     {
-        throw new NotImplementedException();
+        _logger = logger;
+        _jobStore = jobStore;
+    }
+
+    public Task<ChannelReader<string>> StreamOutput(Guid jobId, CancellationToken cancellationToken)
+    {
+        var job = _jobStore.GetJob(jobId);
+        if (job is null)
+        {
+            throw new Exception();
+        }
+
+        _ = job.Run(cancellationToken);
+        
+        return Task.FromResult(job.LoggingChannel.Reader);
+    }
+
+    public Task Ping()
+    {
+        _logger.LogInformation("pong");
+        return Task.CompletedTask;
     }
 }

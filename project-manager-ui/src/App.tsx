@@ -1,33 +1,80 @@
+import { useEffect } from 'react';
 import ActionCard from './components/action-card';
+import LogConsole from './components/log-console';
+import { useActionStore, type Action } from './stores/action-store';
+import Button from './components/button';
+import { CirclePlus } from 'lucide-react';
 
 function App() {
   return (
-    <div className="font-mono">
-      <div className="flex flex-col items-center w-full">
-        <ProjectCard name="Project 1"></ProjectCard>
+    <div className="font-mono h-screen grid grid-cols-[1fr_1fr]">
+      <ActionList />
+      <div className="h-full bg-gray-800 text-gray-100 p-4 overflow-y-auto console-scroll">
+        <LogConsole />
       </div>
     </div>
   );
 }
 
-type ProjectCardProps = { name: string };
+function ActionList() {
+  const { actions, addAction, setActions } = useActionStore();
 
-function ProjectCard({ name }: ProjectCardProps) {
+  useEffect(() => {
+    loadAction();
+    return;
+
+    setActions([
+      {
+        id: 1,
+        name: 'Pack',
+        command: 'dotnet pack --version-suffix {version} -o {output}',
+        workingDir: 'C:/git/project-manager/ProjectManager',
+        args: {},
+      },
+      {
+        id: 2,
+        name: 'Run Chrome',
+        command:
+          'chrome.exe --remote-debugging-port={port} --user-data-dir=/tmp/chrome-debug-profile',
+        workingDir: 'C:/Program Files/Google/Chrome/Application/',
+        args: {},
+      },
+    ]);
+  }, []);
+
+  async function loadAction() {
+    const response = await fetch('http://localhost:5232/api/actions');
+    if (response.status !== 200) {
+      return;
+    }
+
+    const data: Action[] = await response.json();
+    setActions(data);
+  }
+
+  async function createAction() {
+    const response = await fetch('http://localhost:5232/api/actions', {
+      method: 'POST',
+    });
+    if (response.status !== 200) {
+      return;
+    }
+
+    const data: Action = await response.json();
+    addAction(data);
+  }
+
   return (
-    <div className="p-4 min-w-3xl">
-      <h2 className="text-xl">{name}</h2>
-      <div className="mt-2 flex flex-col gap-4">
-        <ActionCard
-          title="Pack"
-          defaultCommand="dotnet pack --version-suffix {version} -o {output}"
-          defaultWorkingDir="C:/git/project-manager/ProjectManager"
-        />
-        <ActionCard
-          title="Run Chrome"
-          defaultCommand="chrome.exe --remote-debugging-port={port} --user-data-dir=/tmp/chrome-debug-profile"
-          defaultWorkingDir="C:/Program Files/Google/Chrome/Application/"
-        />
-      </div>
+    <div className="flex flex-col items-center gap-4 p-4  overflow-y-auto">
+      {actions.length === 0 && <div>No actions</div>}
+      {actions.map((action) => (
+        <ActionCard key={action.id} action={action} />
+      ))}
+      <Button className="w-1/2" onClick={createAction}>
+        <span className="bg-clip-text text-transparent bg-linear-to-r from-amber-500 to-pink-500">
+          Add new action
+        </span>
+      </Button>
     </div>
   );
 }

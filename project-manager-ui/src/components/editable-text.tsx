@@ -1,33 +1,39 @@
-import { SquarePen } from 'lucide-react';
 import { useState } from 'react';
 
-type EditableTextProps = { value: string };
-export default function EditableText(props: EditableTextProps) {
-  const [value, setValue] = useState(props.value);
+type EditableTextProps = {
+  value: string;
+  onChange?: (value: string) => void;
+  onBlur?: () => void;
+};
+export default function EditableText({
+  value,
+  onChange,
+  onBlur,
+}: EditableTextProps) {
   const [editing, setEditing] = useState(false);
 
   function stopEditing() {
-    setValue((val) => val.trim());
+    onChange?.(value.trim());
     setEditing(false);
+    onBlur?.();
   }
 
   return (
     <>
       {!editing && (
         <div
-          className="cursor-text text-lg font-bold group flex justify-between items-center"
+          className="cursor-text text-lg font-bold group flex justify-between items-center rounded-md"
           onClick={() => setEditing(true)}
         >
-          <span>{value}</span>
-          <SquarePen className="text-transparent transition-colors duration-500 group-hover:text-gray-500"></SquarePen>
+          {value}
         </div>
       )}
       {editing && (
         <input
-          className="text-lg font-bold border-2 border-gray-600 rounded-md px-2 py-1"
+          className="text-lg font-bold border-2 border-gray-600 rounded-md px-2 py-1 w-full outline-none"
           autoFocus
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => onChange?.(e.target.value)}
           onBlur={stopEditing}
           onKeyDown={(e) => {
             if (e.key === 'Enter') stopEditing();

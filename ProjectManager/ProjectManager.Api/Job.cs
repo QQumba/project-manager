@@ -1,4 +1,5 @@
-﻿using System.Threading.Channels;
+﻿using System.Text;
+using System.Threading.Channels;
 using CliWrap;
 
 namespace ProjectManager.Api;
@@ -29,6 +30,7 @@ public class Job
         {
             await _command
                 .WithStandardOutputPipe(target)
+                .WithStandardErrorPipe(target)
                 .ExecuteAsync(cancellationToken);
         }
         catch (Exception e)

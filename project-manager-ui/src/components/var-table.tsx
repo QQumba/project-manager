@@ -3,8 +3,9 @@ import { Fragment } from 'react';
 type VarTableProps = {
   value: Record<string, string>;
   onChange: (value: Record<string, string>) => void;
+  onBlur?: () => void;
 };
-export default function VarTable({ value, onChange }: VarTableProps) {
+export default function VarTable({ value, onChange, onBlur }: VarTableProps) {
   const variablesCount = Object.keys(value).length;
 
   if (variablesCount === 0) {
@@ -46,6 +47,7 @@ export default function VarTable({ value, onChange }: VarTableProps) {
                 };
                 onChange(newVar);
               }}
+              onBlur={() => onBlur?.()}
             />
           </div>
         </Fragment>

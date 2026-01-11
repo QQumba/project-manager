@@ -3,7 +3,7 @@ import { create } from 'zustand';
 type LogRecord = {
   id: number;
   message: string;
-  type: 'default' | 'command';
+  type: 'default' | 'command' | 'preview';
 };
 
 interface LogStoreConfig {

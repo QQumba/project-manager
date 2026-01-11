@@ -153,8 +153,9 @@ export default function ActionCard({ action }: ActionCardProps) {
   return (
     <div
       className="flex flex-col gap-2
-                 border-2 border-gray-600 rounded-md
-                 p-4 w-full"
+                 border rounded-md
+                 p-4 w-full
+                 shadow-lg bg-white"
     >
       <div className="flex justify-between items-center gap-2">
         <div className="flex-1">
@@ -189,7 +190,17 @@ export default function ActionCard({ action }: ActionCardProps) {
       </div>
       <VarTable value={args} onChange={setArgs} onBlur={onUpdateAction} />
       <div className="flex justify-around gap-2">
-        <Button onClick={() => console.log(assembleCommand())}>Preview</Button>
+        <Button
+          onClick={() => {
+            const assembledCommand = assembleCommand();
+            addLog({
+              message: `[ACTION PREVIEW] ${assembledCommand}`,
+              type: 'preview',
+            });
+          }}
+        >
+          Preview
+        </Button>
         <Button
           className={`hover:bg-blue-600
             ${status === 'pending' || status === 'loading' ? 'bg-blue-500' : ''}

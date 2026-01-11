@@ -3,7 +3,6 @@ import ActionCard from './components/action-card';
 import LogConsole from './components/log-console';
 import { useActionStore, type Action } from './stores/action-store';
 import Button from './components/button';
-import { CirclePlus } from 'lucide-react';
 
 function App() {
   return (
@@ -22,24 +21,6 @@ function ActionList() {
   useEffect(() => {
     loadAction();
     return;
-
-    setActions([
-      {
-        id: 1,
-        name: 'Pack',
-        command: 'dotnet pack --version-suffix {version} -o {output}',
-        workingDir: 'C:/git/project-manager/ProjectManager',
-        args: {},
-      },
-      {
-        id: 2,
-        name: 'Run Chrome',
-        command:
-          'chrome.exe --remote-debugging-port={port} --user-data-dir=/tmp/chrome-debug-profile',
-        workingDir: 'C:/Program Files/Google/Chrome/Application/',
-        args: {},
-      },
-    ]);
   }, []);
 
   async function loadAction() {
@@ -65,7 +46,7 @@ function ActionList() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-4 p-4  overflow-y-auto">
+    <div className="flex flex-col items-center gap-8 p-4 overflow-y-auto bg-gray-100">
       {actions.length === 0 && <div>No actions</div>}
       {actions.map((action) => (
         <ActionCard key={action.id} action={action} />

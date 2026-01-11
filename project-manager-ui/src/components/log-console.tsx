@@ -23,7 +23,10 @@ export default function LogConsole() {
       )}
       {logs.map((record) => (
         <div
-          className={`${record.type === 'command' ? 'text-amber-300' : ''}`}
+          className={`
+            ${record.type === 'command' ? 'text-amber-300' : ''} 
+            ${record.type === 'preview' ? 'text-green-300' : ''}
+          `}
           key={record.id}
         >
           {record.message}

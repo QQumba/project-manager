@@ -6,6 +6,7 @@ export type Action = {
   workingDir: string;
   command: string;
   args: Record<string, string>;
+  displayOrder: number;
 };
 
 type ActionStore = {

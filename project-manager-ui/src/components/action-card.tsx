@@ -176,7 +176,15 @@ export default function ActionCard({ action }: ActionCardProps) {
           name="work-dir"
           value={workingDir}
           onChange={(e) => setWorkingDir(e.target.value)}
-          onBlur={onUpdateAction}
+          onBlur={() => {
+            let sanitizedWorkingDir = workingDir.replaceAll('\\', '/');
+            if (sanitizedWorkingDir.endsWith('/')) {
+              sanitizedWorkingDir = sanitizedWorkingDir.slice(0, -1);
+            }
+
+            setWorkingDir(sanitizedWorkingDir);
+            onUpdateAction();
+          }}
         />
       </div>
       <div className="flex flex-col">

@@ -34,17 +34,20 @@ app.MapHub<CommandOutputHub>("/logs");
 
 app.MapGet("/api/actions", async (ActionRunnerDbContext db) =>
 {
-    var actions = await db.Actions.ToListAsync();
+    var actions = await db.Actions.OrderBy(x => x.DisplayOrder).ToListAsync();
     return Results.Ok(actions);
 });
 
 app.MapPost("/api/actions", async (ActionRunnerDbContext db) =>
 {
+    var nextOrder = await db.Actions.MaxAsync(x => x.DisplayOrder);
+
     var newAction = new ActionInfo
     {
         Name = "New action",
         Command = string.Empty,
-        Args = JsonDocument.Parse("{}")
+        Args = JsonDocument.Parse("{}"),
+        DisplayOrder = nextOrder + 1
     };
     var entityEntry = db.Actions.Add(newAction);
     await db.SaveChangesAsync();
